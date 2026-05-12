@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypingIQ — Check Your Typing Skill in 1 Minute</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN SYSTEM
+   ============================================================ */
+:root {
+  --bg-primary:    #080c18;
+  --bg-secondary:  #0d1428;
+  --bg-card:       rgba(255,255,255,0.04);
+  --bg-card-hover: rgba(255,255,255,0.07);
+  --glass-border:  rgba(255,255,255,0.08);
+  --glass-border-bright: rgba(99,179,237,0.35);
+
+  --blue:   #3b82f6;
+  --blue2:  #60a5fa;
+  --cyan:   #22d3ee;
+  --purple: #a855f7;
+  --pink:   #ec4899;
+  --green:  #34d399;
+  --red:    #f87171;
+  --amber:  #fbbf24;
+
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #475569;
+
+  --grad-hero:    linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #22d3ee 100%);
+  --grad-btn:     linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --grad-btn2:    linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+  --grad-card:    linear-gradient(145deg, rgba(59,130,246,0.08) 0%, rgba(139,92,246,0.06) 100%);
+
+  --shadow-card:  0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-glow:  0 0 60px rgba(59,130,246,0.15), 0 0 120px rgba(139,92,246,0.08);
+  --shadow-btn:   0 8px 24px rgba(59,130,246,0.35);
+
+  --radius-sm: 10px;
+  --radius:    16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="light"] {
+  --bg-primary:    #f0f4ff;
+  --bg-secondary:  #e8eeff;
+  --bg-card:       rgba(255,255,255,0.85);
+  --bg-card-hover: rgba(255,255,255,0.95);
+  --glass-border:  rgba(59,130,246,0.15);
+  --text-primary:  #0f172a;
+  --text-secondary:#334155;
+  --text-muted:    #94a3b8;
+  --shadow-card:   0 8px 32px rgba(59,130,246,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-glow:   0 0 60px rgba(59,130,246,0.1);
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* Background canvas */
+#bg-canvas {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+}
+
+.page-wrap { position: relative; z-index: 1; }
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 48px;
+  background: rgba(8,12,24,0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  transition: var(--transition);
+}
+[data-theme="light"] nav { background: rgba(240,244,255,0.75); }
+
+.nav-logo {
+  font-size: 20px; font-weight: 800;
+  background: var(--grad-hero);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.nav-right { display: flex; align-items: center; gap: 16px; }
+
+.theme-toggle {
+  width: 44px; height: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  cursor: pointer;
+  position: relative;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--grad-btn);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="light"] .theme-toggle::after { transform: translateX(20px); }
+
+.nav-pill {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: 50px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.nav-pill:hover { border-color: var(--blue); color: var(--blue2); }
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+#hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  position: relative;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-size: 13px; font-weight: 600;
+  color: var(--blue2);
+  margin-bottom: 32px;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-badge span.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--cyan);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+
+.hero-title {
+  font-size: clamp(36px, 6vw, 76px);
+  font-weight: 900;
+  line-height: 1.06;
+  letter-spacing: -2px;
+  margin-bottom: 24px;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+.hero-title .gradient-text {
+  background: var(--grad-hero);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 400;
+  color: var(--text-secondary);
+  max-width: 560px;
+  margin: 0 auto 48px;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+
+.hero-cta {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--grad-btn);
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px; font-weight: 700;
+  padding: 16px 36px;
+  border-radius: var(--radius);
+  border: none; cursor: pointer;
+  box-shadow: var(--shadow-btn);
+  transition: var(--transition);
+  position: relative; overflow: hidden;
+  letter-spacing: 0.3px;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  opacity: 0; transition: opacity 0.2s;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(59,130,246,0.45); }
+.btn-primary:hover::before { opacity: 1; }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px; font-weight: 600;
+  padding: 16px 32px;
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-secondary:hover { border-color: var(--blue); background: var(--bg-card-hover); transform: translateY(-2px); }
+
+/* Hero stats row */
+.hero-stats {
+  display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
+  margin-top: 72px;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.hero-stat { text-align: center; }
+.hero-stat-num {
+  font-size: 32px; font-weight: 800;
+  background: var(--grad-hero);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-stat-label { font-size: 12px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* Scroll arrow */
+.scroll-hint {
+  position: absolute; bottom: 32px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  color: var(--text-muted); font-size: 12px;
+  animation: float 2.5s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-8px)} }
+.scroll-arrow {
+  width: 24px; height: 24px;
+  border-right: 2px solid var(--text-muted);
+  border-bottom: 2px solid var(--text-muted);
+  transform: rotate(45deg);
+}
+
+/* ============================================================
+   MAIN TEST SECTION
+   ============================================================ */
+#test-section {
+  padding: 80px 24px 120px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-label {
+  text-align: center;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 12px;
+}
+
+.section-title {
+  text-align: center;
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 800; letter-spacing: -1px;
+  margin-bottom: 48px;
+}
+
+/* Difficulty selector */
+.difficulty-row {
+  display: flex; justify-content: center; gap: 12px;
+  margin-bottom: 32px; flex-wrap: wrap;
+}
+
+.diff-btn {
+  font-family: 'Poppins', sans-serif;
+  font-size: 13px; font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 50px;
+  border: 1.5px solid var(--glass-border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.02em;
+}
+.diff-btn:hover { border-color: var(--blue); color: var(--blue2); }
+.diff-btn.active-easy   { border-color: var(--green);  color: var(--green);  background: rgba(52,211,153,0.08); }
+.diff-btn.active-medium { border-color: var(--amber);  color: var(--amber);  background: rgba(251,191,36,0.08); }
+.diff-btn.active-hard   { border-color: var(--pink);   color: var(--pink);   background: rgba(236,72,153,0.08); }
+
+/* Test Card */
+.test-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+}
+.test-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99,179,237,0.5), transparent);
+}
+
+/* Stats bar */
+.stats-bar {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  text-align: center;
+  transition: var(--transition);
+}
+.stat-box:hover { border-color: var(--glass-border-bright); }
+
+.stat-box-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px; font-weight: 600;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-box-val.timer-val { color: var(--cyan); }
+.stat-box-val.wpm-val   { color: var(--blue2); }
+.stat-box-val.acc-val   { color: var(--green); }
+.stat-box-val.err-val   { color: var(--red); }
+.stat-box-val.timer-low { color: var(--red); animation: timerPulse 0.5s ease infinite; }
+@keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+.stat-box-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); }
+
+/* Progress bar */
+.progress-wrap {
+  height: 4px; background: var(--bg-secondary);
+  border-radius: 2px; margin-bottom: 28px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--purple), var(--cyan));
+  border-radius: 2px;
+  transition: width 1s linear;
+  width: 100%;
+}
+
+/* Text display */
+.text-display-wrap {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  line-height: 1.9;
+  letter-spacing: 0.02em;
+  min-height: 120px;
+  position: relative;
+  overflow: hidden;
+}
+
+.word { display: inline; }
+.word .ch { position: relative; display: inline; }
+.word .ch.correct { color: var(--green); }
+.word .ch.wrong   { color: var(--red); background: rgba(248,113,113,0.1); border-radius: 2px; }
+.word .ch.pending { color: var(--text-muted); }
+.word .ch.cursor::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -2px;
+  width: 100%; height: 2.5px;
+  background: var(--cyan);
+  border-radius: 2px;
+  animation: cursorBlink 0.8s ease-in-out infinite;
+}
+@keyframes cursorBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+.word.current-word { background: rgba(59,130,246,0.07); border-radius: 4px; padding: 0 2px; }
+.word.typed-correct { color: var(--green); }
+.word.typed-wrong   { color: var(--red); }
+
+/* Input */
+.type-input-wrap { position: relative; }
+.type-input-wrap::before {
+  content: '⌨';
+  position: absolute;
+  left: 18px; top: 50%; transform: translateY(-50%);
+  font-size: 18px; color: var(--text-muted);
+  pointer-events: none;
+}
+.type-input {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  padding: 16px 20px 16px 48px;
+  outline: none;
+  transition: var(--transition);
+  caret-color: var(--cyan);
+}
+.type-input::placeholder { color: var(--text-muted); }
+.type-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+}
+.type-input.shake {
+  animation: shake 0.3s ease;
+  border-color: var(--red);
+}
+@keyframes shake {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-4px)}
+  40%{transform:translateX(4px)}
+  60%{transform:translateX(-3px)}
+  80%{transform:translateX(3px)}
+}
+
+/* Test start overlay */
+.test-overlay {
+  position: absolute; inset: 0; z-index: 10;
+  background: rgba(8,12,24,0.85);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-xl);
+  transition: opacity 0.4s, visibility 0.4s;
+}
+[data-theme="light"] .test-overlay { background: rgba(240,244,255,0.88); }
+.test-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.overlay-content { text-align: center; }
+.overlay-icon { font-size: 48px; margin-bottom: 16px; }
+.overlay-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.overlay-sub { color: var(--text-secondary); font-size: 14px; margin-bottom: 28px; }
+
+/* ============================================================
+   RESULT CARD
+   ============================================================ */
+#result-section { display: none; padding: 0 24px 120px; }
+#result-section.show { display: block; animation: fadeUp 0.5s ease; }
+
+.result-card {
+  max-width: 760px; margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 48px;
+  box-shadow: var(--shadow-glow), var(--shadow-card);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.result-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--grad-hero);
+}
+
+.result-emoji { font-size: 56px; margin-bottom: 16px; }
+.result-title { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+.result-msg { color: var(--text-secondary); font-size: 15px; margin-bottom: 40px; }
+
+.result-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+  margin-bottom: 40px;
+}
+
+.result-metric {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 24px 16px;
+}
+.result-metric-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 34px; font-weight: 700;
+  margin-bottom: 6px;
+}
+.result-metric-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); }
+
+/* Performance bar */
+.perf-section { margin-bottom: 36px; text-align: left; }
+.perf-header { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
+.perf-track { height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden; }
+.perf-fill { height: 100%; border-radius: 4px; background: var(--grad-hero); transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+.result-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+/* ============================================================
+   HOW IT WORKS
+   ============================================================ */
+#how-section {
+  padding: 80px 24px;
+  max-width: 1000px; margin: 0 auto;
+}
+
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+.feature-card {
+  background: var(--grad-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  transition: var(--transition);
+}
+.feature-card:hover { border-color: var(--glass-border-bright); transform: translateY(-4px); box-shadow: var(--shadow-card); }
+
+.feature-icon {
+  width: 52px; height: 52px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; margin-bottom: 20px;
+}
+.fi-blue   { background: rgba(59,130,246,0.15); }
+.fi-purple { background: rgba(168,85,247,0.15); }
+.fi-cyan   { background: rgba(34,211,238,0.15); }
+
+.feature-title { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+.feature-desc  { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer {
+  border-top: 1px solid var(--glass-border);
+  padding: 32px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  color: var(--text-muted); font-size: 13px; flex-wrap: wrap; gap: 16px;
+}
+footer .footer-logo {
+  font-weight: 800;
+  background: var(--grad-hero);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal { animation: fadeUp 0.6s ease both; }
+.reveal-1 { animation-delay: 0.1s; }
+.reveal-2 { animation-delay: 0.2s; }
+.reveal-3 { animation-delay: 0.3s; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  nav { padding: 14px 20px; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .result-grid { grid-template-columns: repeat(2, 1fr); }
+  .features-grid { grid-template-columns: 1fr; }
+  .test-card { padding: 24px; }
+  .text-display-wrap { font-size: 15px; padding: 20px; }
+  footer { flex-direction: column; text-align: center; }
+}
+
+/* Sound wave indicator */
+.sound-indicator {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-size: 12px; font-weight: 600;
+  color: var(--text-secondary);
+  display: flex; align-items: center; gap: 6px;
+  transition: var(--transition); cursor: pointer;
+  z-index: 50;
+}
+.sound-indicator:hover { border-color: var(--blue); color: var(--blue2); }
+
+/* confetti particle */
+.confetti-piece {
+  position: fixed;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 200;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity:1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity:0; }
+}
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+/* CONTAINER */
+.container {
+  text-align: center;
+}
+
+h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+p.subtitle {
+  color: #94a3b8;
+  margin-bottom: 40px;
+}
+
+/* CARDS */
+.cards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 40px;
+  gap: 25px;
+}
+
+/* CARD BASE */
+.card {
+  position: relative;
+  width: 220px;
+  padding: 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: all 0.35s ease;
+  overflow: hidden;
+}
+
+/* HOVER SCALE */
+.card:hover {
+  transform: translateY(-10px) scale(1.03);
+}
+
+/* ICON */
+.icon {
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+/* TEXT */
+.card h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 14px;
+  color: #cbd5f5;
+}
+
+/* GLOW EFFECTS */
+.easy:hover {
+  border-color: #22c55e;
+  box-shadow: 0 0 25px rgba(34,197,94,0.6);
+}
+
+.medium:hover {
+  border-color: #facc15;
+  box-shadow: 0 0 25px rgba(250,204,21,0.6);
+}
+
+.hard:hover {
+  border-color: #ef4444;
+  box-shadow: 0 0 25px rgba(239,68,68,0.6);
+}
+
+/* ACTIVE STATE */
+.card.active {
+  transform: scale(1.05);
+}
+
+.card.active.easy {
+  background: rgba(34,197,94,0.15);
+}
+
+.card.active.medium {
+  background: rgba(250,204,21,0.15);
+}
+
+.card.active.hard {
+  background: rgba(239,68,68,0.15);
+}
+
+/* GLOW BORDER ANIMATION */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  opacity: 0;
+  transition: 0.4s;
+}
+
+.easy:hover::before {
+  box-shadow: inset 0 0 40px rgba(34,197,94,0.3);
+  opacity: 1;
+}
+
+.medium:hover::before {
+  box-shadow: inset 0 0 40px rgba(250,204,21,0.3);
+  opacity: 1;
+}
+
+.hard:hover::before {
+  box-shadow: inset 0 0 40px rgba(239,68,68,0.3);
+  opacity: 1;
+}
+
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<div class="page-wrap">
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">TypingIQ</div>
+  <div class="nav-right">
+    <button class="nav-pill" onclick="document.getElementById('test-section').scrollIntoView({behavior:'smooth'})">Start Test</button>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle theme" onclick="toggleTheme()"></button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-badge"><span class="dot"></span> Free · No signup required · Instant results</div>
+  <h1 class="hero-title">
+    Check Your Typing<br>
+    Skill in <span class="gradient-text">1 Minute</span>
+  </h1>
+  <p class="hero-sub">Test your typing speed, accuracy, and improve your skills with our smart typing trainer. Real-time feedback. No distractions.</p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.getElementById('test-section').scrollIntoView({behavior:'smooth'})">
+      <span>🚀</span> Start Typing Test
+    </button>
+    <button class="btn-secondary" onclick="document.getElementById('how-section').scrollIntoView({behavior:'smooth'})">
+      How it works
+    </button>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num">50K+</div><div class="hero-stat-label">Tests taken</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">72</div><div class="hero-stat-label">Avg WPM</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-label">Difficulty levels</div></div>
+  </div>
+  <div class="scroll-hint"><div class="scroll-arrow"></div></div>
+</section>
+
+  <!-- Difficulty -->
+   <div class="container">
+  <h1>Choose Your Difficulty</h1>
+  <p class="subtitle">Select a difficulty level to begin your typing test</p>
+
+  <div class="cards">
+<div class="card easy" onclick="selectCard(this)">
+  <div class="icon">⚡</div>
+  <h3>Easy</h3>
+  <p>Simple words and short sentences</p>
+</div>
+
+<div class="card medium" onclick="selectCard(this)">
+  <div class="icon">🎯</div>
+  <h3>Medium</h3>
+  <p>Balanced text with moderate vocabulary</p>
+</div>
+
+<div class="card hard" onclick="selectCard(this)">
+  <div class="icon">🔥</div>
+  <h3>Hard</h3>
+  <p>Complex paragraphs with advanced words</p>
+</div>
+
+
+  </div>
+</div>
+
+  <!-- Test Card -->
+  <div class="test-card" id="test-card">
+
+    <!-- Overlay -->
+    <div class="test-overlay" id="test-overlay">
+      <div class="overlay-content">
+        <div class="overlay-icon">⌨️</div>
+        <div class="overlay-title">Ready to start?</div>
+        <div class="overlay-sub">Pick a difficulty above, then click start</div>
+        <button class="btn-primary" onclick="beginTest()"><span>▶</span> Begin Test</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-box">
+        <div class="stat-box-val timer-val" id="stat-timer">60</div>
+        <div class="stat-box-label">⏱ Timer</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val wpm-val" id="stat-wpm">0</div>
+        <div class="stat-box-label">⚡ WPM</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val acc-val" id="stat-acc">100%</div>
+        <div class="stat-box-label">🎯 Accuracy</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val err-val" id="stat-err">0</div>
+        <div class="stat-box-label">❌ Mistakes</div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <!-- Text display -->
+    <div class="text-display-wrap" id="text-display"></div>
+
+    <!-- Input -->
+    <div class="type-input-wrap" style="margin-top:20px">
+      <input
+        type="text"
+        class="type-input"
+        id="type-input"
+        placeholder="Start typing here…"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        disabled
+      />
+    </div>
+
+  </div><!-- /test-card -->
+</section>
+
+<!-- RESULT SECTION -->
+<section id="result-section">
+  <div class="result-card" id="result-card">
+    <div class="result-emoji" id="res-emoji">🎉</div>
+    <div class="result-title" id="res-title">Great job!</div>
+    <div class="result-msg" id="res-msg">Keep practicing to improve your typing speed</div>
+
+    <div class="result-grid">
+      <div class="result-metric">
+        <div class="result-metric-val" style="color:var(--blue2)" id="rm-wpm">0</div>
+        <div class="result-metric-label">WPM</div>
+      </div>
+      <div class="result-metric">
+        <div class="result-metric-val" style="color:var(--green)" id="rm-acc">0%</div>
+        <div class="result-metric-label">Accuracy</div>
+      </div>
+      <div class="result-metric">
+        <div class="result-metric-val" style="color:var(--red)" id="rm-err">0</div>
+        <div class="result-metric-label">Mistakes</div>
+      </div>
+      <div class="result-metric">
+        <div class="result-metric-val" style="color:var(--purple)" id="rm-chars">0</div>
+        <div class="result-metric-label">Chars Typed</div>
+      </div>
+    </div>
+
+    <div class="perf-section">
+      <div class="perf-header"><span>Performance Score</span><span id="perf-pct">0%</span></div>
+      <div class="perf-track"><div class="perf-fill" id="perf-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-primary" onclick="retryTest()"><span>↺</span> Try Again</button>
+      <button class="btn-secondary" onclick="document.getElementById('how-section').scrollIntoView({behavior:'smooth'})">📚 Train Typing Skill</button>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-section">
+  <div class="section-label">— Features —</div>
+  <h2 class="section-title" style="margin-bottom:40px">Why TypingIQ?</h2>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-icon fi-blue">⚡</div>
+      <div class="feature-title">Real-time Feedback</div>
+      <div class="feature-desc">See your WPM, accuracy, and mistake count update live as you type. No waiting for results — your performance is tracked every keystroke.</div>
+    </div>
+    <div class="feature-card reveal reveal-1">
+      <div class="feature-icon fi-purple">🎯</div>
+      <div class="feature-title">3 Difficulty Levels</div>
+      <div class="feature-desc">From easy common words to technical vocabulary. Gradually challenge yourself and track your improvement across all levels.</div>
+    </div>
+    <div class="feature-card reveal reveal-2">
+      <div class="feature-icon fi-cyan">📊</div>
+      <div class="feature-title">Detailed Analytics</div>
+      <div class="feature-desc">Get a comprehensive results breakdown — WPM, accuracy percentage, total mistakes, and characters typed. Know exactly where to improve.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div><span class="footer-logo">TypingIQ</span> — Check Your Typing Skill in 1 Minute</div>
+  <div>Built for speed lovers 🚀</div>
+</footer>
+
+</div><!-- /page-wrap -->
+
+<!-- Sound toggle -->
+<div class="sound-indicator" id="sound-toggle" onclick="toggleSound()">
+  <span id="sound-icon">🔊</span> Sound
+</div>
+
+<script>
+  function selectCard(selected) {
+  document.querySelectorAll('.card').forEach(card => {
+    card.classList.remove('active');
+  });
+  selected.classList.add('active');
+}
+// ============================================================
+// PARAGRAPHS
+// ============================================================
+const PARAGRAPHS = {
+  easy: [
+    "the sun was bright and the sky was clear. birds sang in the trees and children played in the park. it was a warm and happy day for everyone. the dog ran across the green grass and wagged its tail. life felt simple and good.",
+    "she opened the window and let in the fresh air. the smell of rain was still there from the night before. she made a cup of tea and sat by the light. it was a quiet morning and she felt at peace.",
+    "he walked to the store and bought some bread and milk. the street was not busy and the air was cool. he waved to his neighbor and smiled. small things like this made him feel good.",
+    "the cat sat on the soft chair near the window. the sun made warm spots on the floor. she closed her eyes and slept in the light. it was her best spot in the whole house."
+  ],
+  medium: [
+    "technology continues to reshape the way humans interact with information and with each other. From smartphones to artificial intelligence, innovations emerge at a pace that challenges our ability to adapt. Understanding these shifts requires curiosity and a willingness to learn continuously throughout life.",
+    "good communication is the foundation of any successful relationship, whether personal or professional. It involves not just the words we choose but also tone, timing, and the ability to listen with intention. Misunderstandings often arise not from lack of intelligence but from poor expression.",
+    "the ocean covers over seventy percent of our planet's surface and remains one of the least explored places on Earth. Scientists believe thousands of species are yet to be discovered in its depths. Protecting marine ecosystems is critical to maintaining the balance of life above and below water.",
+    "learning a new language opens doors to different cultures, ideas, and ways of thinking. It challenges the brain and builds empathy by forcing you to see the world through another lens. Even a basic knowledge of a foreign language can transform the experience of travel."
+  ],
+  hard: [
+    "The epistemological implications of artificial neural networks extend beyond mere computational efficiency; they fundamentally challenge our understanding of cognition, representation, and emergent intelligence. Whether such systems genuinely comprehend or merely simulate comprehension remains a philosophically contested question with profound ethical ramifications.",
+    "Compilers perform lexical tokenization, syntactic parsing via context-free grammars, semantic analysis including type checking and scope resolution, followed by intermediate representation generation, architecture-specific optimization passes, and finally target-code emission — a multi-layered transformation pipeline requiring both formal language theory and systems-level engineering expertise.",
+    "Throughout the sixteenth century, advancements in cartographic methodology, celestial navigation techniques, and naval engineering converged to enable unprecedented transoceanic exploration, catalyzing the Columbian Exchange of biological organisms and precipitating the socioeconomic transformations that would irrevocably alter civilizational trajectories across multiple continents.",
+    "Quantum entanglement represents a non-classical correlation between particles whereby measuring one instantaneously determines the state of its entangled partner, regardless of the spatial separation between them — a phenomenon that undermines local realism and challenges classical notions of causality and information propagation."
+  ]
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let state = {
+  difficulty: 'easy',
+  paragraph: '',
+  words: [],
+  currentWordIdx: 0,
+  charIdx: 0,
+  started: false,
+  finished: false,
+  timer: null,
+  timeLeft: 60,
+  totalTime: 60,
+  mistakes: 0,
+  totalTyped: 0,
+  correctChars: 0,
+  wordResults: [],   // per-word: 'correct' | 'wrong' | 'pending'
+  soundOn: true,
+};
+
+// AudioContext for error sound
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playError() {
+  if (!state.soundOn) return;
+  try {
+    const ctx = getAudio();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(200, ctx.currentTime);
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.start(); osc.stop(ctx.currentTime + 0.15);
+  } catch(e) {}
+}
+
+// ============================================================
+// THEME
+// ============================================================
+function toggleTheme() {
+  const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = t;
+}
+
+function toggleSound() {
+  state.soundOn = !state.soundOn;
+  document.getElementById('sound-icon').textContent = state.soundOn ? '🔊' : '🔇';
+}
+
+// ============================================================
+// BACKGROUND CANVAS
+// ============================================================
+(function initCanvas() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let W, H;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Create orbs
+  const orbs = [
+    { x: 0.2, y: 0.2, r: 350, col: '59,130,246', speed: 0.0003 },
+    { x: 0.8, y: 0.7, r: 280, col: '139,92,246',  speed: 0.0004 },
+    { x: 0.5, y: 0.9, r: 220, col: '34,211,238',  speed: 0.0005 },
+  ];
+  let t = 0;
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    const isDark = document.documentElement.dataset.theme !== 'light';
+    t += 0.01;
+
+    orbs.forEach((o, i) => {
+      const x = (o.x + Math.sin(t * o.speed * 100 + i) * 0.06) * W;
+      const y = (o.y + Math.cos(t * o.speed * 80  + i) * 0.05) * H;
+      const grd = ctx.createRadialGradient(x, y, 0, x, y, o.r);
+      const alpha = isDark ? 0.12 : 0.06;
+      grd.addColorStop(0, `rgba(${o.col},${alpha})`);
+      grd.addColorStop(1, `rgba(${o.col},0)`);
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(x, y, o.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ============================================================
+// DIFFICULTY
+// ============================================================
+function setDiff(d) {
+  state.difficulty = d;
+  ['easy','medium','hard'].forEach(x => {
+    const btn = document.getElementById('diff-' + x);
+    btn.className = 'diff-btn' + (x === d ? ' active-' + x : '');
+  });
+  resetToOverlay();
+}
+
+// ============================================================
+// SETUP & RENDER
+// ============================================================
+function pickParagraph() {
+  const arr = PARAGRAPHS[state.difficulty];
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function resetToOverlay() {
+  clearInterval(state.timer);
+  state = { ...state, paragraph:'', words:[], currentWordIdx:0, charIdx:0,
+    started:false, finished:false, timer:null, timeLeft:60, totalTime:60,
+    mistakes:0, totalTyped:0, correctChars:0, wordResults:[] };
+  document.getElementById('test-overlay').classList.remove('hidden');
+  document.getElementById('type-input').value = '';
+  document.getElementById('type-input').disabled = true;
+  document.getElementById('stat-timer').textContent = '60';
+  document.getElementById('stat-timer').className = 'stat-box-val timer-val';
+  document.getElementById('stat-wpm').textContent  = '0';
+  document.getElementById('stat-acc').textContent  = '100%';
+  document.getElementById('stat-err').textContent  = '0';
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('text-display').innerHTML = '';
+  document.getElementById('result-section').classList.remove('show');
+}
+
+function beginTest() {
+  state.paragraph = pickParagraph();
+  state.words = state.paragraph.split(' ');
+  state.wordResults = new Array(state.words.length).fill('pending');
+  state.currentWordIdx = 0;
+  state.charIdx = 0;
+  state.timeLeft = 60;
+  state.mistakes = 0;
+  state.totalTyped = 0;
+  state.correctChars = 0;
+  state.started = false;
+  state.finished = false;
+
+  renderText();
+  document.getElementById('test-overlay').classList.add('hidden');
+  const inp = document.getElementById('type-input');
+  inp.disabled = false;
+  inp.value = '';
+  inp.focus();
+}
+
+function renderText() {
+  const display = document.getElementById('text-display');
+  display.innerHTML = '';
+  const para = state.paragraph;
+  const words = state.words;
+
+  words.forEach((word, wi) => {
+    const wordSpan = document.createElement('span');
+    wordSpan.className = 'word';
+    wordSpan.id = 'word-' + wi;
+
+    // Characters
+    word.split('').forEach((ch, ci) => {
+      const s = document.createElement('span');
+      s.className = 'ch pending';
+      s.id = `ch-${wi}-${ci}`;
+      s.textContent = ch;
+      // cursor on first char of first word
+      if (wi === 0 && ci === 0) s.classList.add('cursor');
+      wordSpan.appendChild(s);
+    });
+
+    display.appendChild(wordSpan);
+    // space
+    if (wi < words.length - 1) display.appendChild(document.createTextNode(' '));
+  });
+
+  updateWordClass();
+}
+
+function updateWordClass() {
+  state.words.forEach((_, wi) => {
+    const el = document.getElementById('word-' + wi);
+    if (!el) return;
+    el.classList.remove('current-word', 'typed-correct', 'typed-wrong');
+    if (wi === state.currentWordIdx) { el.classList.add('current-word'); }
+    else if (state.wordResults[wi] === 'correct') el.classList.add('typed-correct');
+    else if (state.wordResults[wi] === 'wrong') el.classList.add('typed-wrong');
+  });
+}
+
+// ============================================================
+// INPUT HANDLING
+// ============================================================
+document.getElementById('type-input').addEventListener('input', handleInput);
+document.getElementById('type-input').addEventListener('keydown', handleKeyDown);
+
+function handleKeyDown(e) {
+  if (state.finished) return;
+  if (e.key === ' ') {
+    e.preventDefault();
+    commitWord();
+  }
+}
+
+function handleInput(e) {
+  if (state.finished) return;
+
+  if (!state.started) {
+    state.started = true;
+    startTimer();
+  }
+
+  const val = e.target.value;
+  const currentWord = state.words[state.currentWordIdx];
+  state.totalTyped = val.length;
+
+  // Remove cursor from all
+  document.querySelectorAll('.ch.cursor').forEach(c => c.classList.remove('cursor'));
+
+  // Colour chars of current word
+  for (let i = 0; i < currentWord.length; i++) {
+    const chEl = document.getElementById(`ch-${state.currentWordIdx}-${i}`);
+    if (!chEl) continue;
+    chEl.classList.remove('correct', 'wrong', 'pending', 'cursor');
+    if (i < val.length) {
+      if (val[i] === currentWord[i]) chEl.classList.add('correct');
+      else {
+        chEl.classList.add('wrong');
+      }
+    } else {
+      chEl.classList.add('pending');
+      if (i === val.length) chEl.classList.add('cursor');
+    }
+  }
+  // cursor beyond word length
+  if (val.length >= currentWord.length) {
+    const last = document.getElementById(`ch-${state.currentWordIdx}-${currentWord.length - 1}`);
+    if (last) last.classList.add('cursor');
+  }
+
+  updateLiveStats(val);
+}
+
+function commitWord() {
+  if (state.finished) return;
+  const inp = document.getElementById('type-input');
+  const val = inp.value.trim();
+  if (!val) return;
+
+  const currentWord = state.words[state.currentWordIdx];
+  const isCorrect = val === currentWord;
+
+  state.wordResults[state.currentWordIdx] = isCorrect ? 'correct' : 'wrong';
+
+  if (!isCorrect) {
+    state.mistakes++;
+    playError();
+    inp.classList.add('shake');
+    setTimeout(() => inp.classList.remove('shake'), 300);
+  } else {
+    state.correctChars += currentWord.length + 1; // +1 for space
+  }
+
+  state.currentWordIdx++;
+
+  if (state.currentWordIdx >= state.words.length) {
+    // All words typed
+    finishTest();
+    return;
+  }
+
+  inp.value = '';
+  updateWordClass();
+
+  // Set cursor on next word first char
+  const nextChEl = document.getElementById(`ch-${state.currentWordIdx}-0`);
+  if (nextChEl) nextChEl.classList.add('cursor');
+
+  // Scroll if needed
+  const nextWord = document.getElementById('word-' + state.currentWordIdx);
+  if (nextWord) nextWord.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  updateLiveStats('');
+}
+
+function updateLiveStats(currentVal) {
+  const elapsed = (60 - state.timeLeft) || 0.01;
+  const wordsCorrect = state.wordResults.filter(r => r === 'correct').length;
+  const wpm = Math.round((wordsCorrect / elapsed) * 60);
+
+  const totalAttempted = state.currentWordIdx + (currentVal ? 1 : 0);
+  const wrongWords = state.wordResults.filter(r => r === 'wrong').length;
+  const acc = totalAttempted > 0 ? Math.round(((totalAttempted - wrongWords) / totalAttempted) * 100) : 100;
+
+  document.getElementById('stat-wpm').textContent  = wpm;
+  document.getElementById('stat-acc').textContent  = acc + '%';
+  document.getElementById('stat-err').textContent  = state.mistakes;
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+function startTimer() {
+  state.timeLeft = 60;
+  updateTimerDisplay();
+  state.timer = setInterval(() => {
+    state.timeLeft--;
+    updateTimerDisplay();
+    updateLiveStats(document.getElementById('type-input').value);
+    if (state.timeLeft <= 0) finishTest();
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('stat-timer');
+  el.textContent = state.timeLeft;
+  const isLow = state.timeLeft <= 10;
+  el.className = 'stat-box-val timer-val' + (isLow ? ' timer-low' : '');
+  const pct = (state.timeLeft / 60) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ============================================================
+// FINISH
+// ============================================================
+function finishTest() {
+  if (state.finished) return;
+  state.finished = true;
+  clearInterval(state.timer);
+
+  const inp = document.getElementById('type-input');
+  inp.disabled = true;
+
+  // Commit last word if any
+  const val = inp.value.trim();
+  if (val && state.currentWordIdx < state.words.length) {
+    const isCorrect = val === state.words[state.currentWordIdx];
+    state.wordResults[state.currentWordIdx] = isCorrect ? 'correct' : 'wrong';
+    if (!isCorrect) state.mistakes++;
+    else { state.correctChars += state.words[state.currentWordIdx].length; state.currentWordIdx++; }
+  }
+
+  const elapsed = 60 - state.timeLeft || 1;
+  const wordsCorrect = state.wordResults.filter(r => r === 'correct').length;
+  const wpm = Math.round((wordsCorrect / elapsed) * 60);
+  const totalWords = state.wordResults.filter(r => r !== 'pending').length;
+  const acc = totalWords > 0 ? Math.round((wordsCorrect / totalWords) * 100) : 0;
+  const charsTyped = state.words.slice(0, state.currentWordIdx).join(' ').length;
+
+  showResults(wpm, acc, state.mistakes, charsTyped);
+  spawnConfetti(wpm);
+}
+
+function showResults(wpm, acc, mistakes, chars) {
+  const [emoji, title, msg] = getMotivation(wpm, acc);
+
+  document.getElementById('res-emoji').textContent = emoji;
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-msg').textContent = msg;
+  document.getElementById('rm-wpm').textContent  = wpm;
+  document.getElementById('rm-acc').textContent  = acc + '%';
+  document.getElementById('rm-err').textContent  = mistakes;
+  document.getElementById('rm-chars').textContent = chars;
+
+  const perfPct = Math.min(100, Math.round((wpm / 120) * 100));
+  document.getElementById('perf-pct').textContent = perfPct + '%';
+
+  const section = document.getElementById('result-section');
+  section.classList.add('show');
+  section.scrollIntoView({ behavior: 'smooth' });
+
+  setTimeout(() => {
+    document.getElementById('perf-fill').style.width = perfPct + '%';
+  }, 300);
+}
+
+function getMotivation(wpm, acc) {
+  if (wpm >= 100) return ['🏆','World-class Typist!','You\'re in the top 1% of all typists. Truly remarkable speed!'];
+  if (wpm >= 80)  return ['🚀','Expert Level!','Exceptional speed! You\'re significantly above average.'];
+  if (wpm >= 60)  return ['⚡','Advanced Typist!','Well above average — keep pushing to reach expert level!'];
+  if (wpm >= 40)  return ['✅','Proficient!','Solid speed! Regular practice will get you to the next level.'];
+  if (wpm >= 20)  return ['📈','Getting There!','Good start! Daily practice will quickly boost your WPM.'];
+  return ['🌱','Just Beginning!','Every expert started here. Keep typing and you\'ll improve fast!'];
+}
+
+function retryTest() {
+  document.getElementById('result-section').classList.remove('show');
+  document.getElementById('test-section').scrollIntoView({ behavior: 'smooth' });
+  setTimeout(() => resetToOverlay(), 400);
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function spawnConfetti(wpm) {
+  if (wpm < 30) return;
+  const count = Math.min(60, wpm);
+  const colors = ['#3b82f6','#8b5cf6','#22d3ee','#34d399','#f59e0b','#ec4899'];
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.cssText = `
+      left: ${Math.random() * 100}vw;
+      top: -20px;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      width: ${6 + Math.random() * 8}px;
+      height: ${6 + Math.random() * 8}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-duration: ${1.5 + Math.random() * 2}s;
+      animation-delay: ${Math.random() * 0.8}s;
+    `;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+}
+</script>
+</body>
+</html>
